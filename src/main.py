@@ -2,6 +2,7 @@ import sys
 import subprocess
 PACOTES_NECESSARIOS = ['sympy']
 
+#pacotes nessários para o projeto, caso não estejam instalados, o programa irá instalar automaticamente.
 for pacote in PACOTES_NECESSARIOS:
     try:
         __import__(pacote)
@@ -12,14 +13,27 @@ from functions import*
 
 def main():
     print("Testando método da Bisseção original")
-    fx = f(1)
-    dfx = df(fx)
-    print("f(d) = ",fx)
-    print("\t",Bissecao(fx,[2,3],10**(-5))[1])
-    print("Testando método da Posição Falsa")
-    print("\t",PF(fx,[2,3],10**(-5))[1])
-    print("Testando método de Newton-Raphson")
-    print("\t",NR(fx,dfx,10**(-5))[1])
+    fx = funcao(1) # função para a = 1
+    dfx = df(fx)   # derivada da função para a = 1  
+    
+    Bi = Bissecao(fx,[2,3],10**(-5))[-1] # resultado final do método da bisseção para a = 1, intervalo [2,3] e erro de 10^(-5)
+    
+    print(f"Método da Bisseção: f(d) = {fx}")
+    print(f"\t i | a       | f(a)    | b       | f(b)      | d        |   f(d)    | |b-a|")
+    print(f"\t{Bi['i']} |{Bi['a']:.6f} |{Bi['fa']:.2e} |{Bi['b']:.6f} | {Bi['fb']:.2e} | {Bi['d']:.6f} | {Bi['fx']:.2e} | {Bi['|b-a|']:.2e}\n")
+
+    print(f"Testando método da Posição Falsa: f(d) = {fx}")
+    PF_result = PF(fx,[2,3],10**(-5))[-1] # resultado final do método da posição falsa para a = 1, intervalo [2,3] e erro de 10^(-5)
+    
+    print(f"\t i | a       | f(a)    | b       | f(b)      | d        |   f(d)    | |b-a|")
+    print(f"\t{PF_result['i']} |{PF_result['a']:.6f} |{PF_result['fa']:.2e} |{PF_result['b']:.6f} | {PF_result['fb']:.2e} | {PF_result['d']:.6f} | {PF_result['fx']:.2e} | {PF_result['|b-a|']:.2e}\n")
+
+    print(f"Testando método de Newton-Raphson: f(d) = {fx}")
+    NR_result = NR(fx,dfx,10**(-5),[2,3])[-1] # resultado final do método de Newton-Raphson para a = 1 e erro de 10^(-5)
+
+    print(f"\t i | d       | f(d)")
+    print(f"\t{NR_result['i']} |{NR_result['d']:.6f} |{NR_result['f(d)']:.2e}\n")
+   
     print("Agora é sua vez!")
     while True:
         try:
@@ -27,17 +41,19 @@ def main():
             F = []
             for _ in range(n):
                 a = float(input("Digite o valor de a: "))
-                fx = f(a)
+                fx = funcao(a)
                 dfx = df(fx)
-                I = [float(input("Digite o valor de I1: ")), float(input("Digite o valor de I2: "))]
+                I = invervalo(fx)
                 e = float(input("Digite o valor do erro: "))
                 F.append((fx, dfx,I,e))
             for i, (fx, dfx, I, e) in enumerate(F):
-                print(f"Foguete {i+1}:")
-                print("f(d) = ",fx)
-                print("\tBisseção:", Bissecao(fx, I, e)[0])
-                print("\tPosição Falsa:", PF(fx, I, e)[0])
-                print("\tNewton-Raphson:", NR(fx, dfx, e)[0])
+                print(f"Foguete {i+1}: | f(d) = {fx}  | Intervalo: {I} | Erro: {e})")
+                Bi = Bissecao(fx, I, e)[-1]
+                Pf = PF(fx, I, e)[-1]
+                NRr = NR(fx, dfx, e)[-1]
+                print(f"\tMétodo da Bisseção: d = {Bi['d']:.6f}, f(d) = {Bi['fx']:.2e}")
+                print(f"\tPosição Falsa: d = {Pf['d']:.6f}, f(d) = {Pf['fx']:.2e}")
+                print(f"\tNewton-Raphson: d = {NRr['d']:.6f}, f(d) = {NRr['f(d)']:.2e}")
         except ValueError:
             print("Valor inválido. Por favor, digite um número.")
 
