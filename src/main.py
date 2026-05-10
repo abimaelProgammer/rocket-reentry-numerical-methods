@@ -1,5 +1,10 @@
 import sys
 import subprocess
+import sympy as sp 
+from functions import * 
+d = sp.Symbol('d')
+
+
 PACOTES_NECESSARIOS = ['sympy']
 
 #pacotes nessários para o projeto, caso não estejam instalados, o programa irá instalar automaticamente.
@@ -32,30 +37,42 @@ def main():
     NR_result = NR(fx,dfx,10**(-5),[2,3])[-1] # resultado final do método de Newton-Raphson para a = 1 e erro de 10^(-5)
 
     print(f"\t i | d       | f(d)")
-    print(f"\t{NR_result['i']} |{NR_result['d']:.6f} |{NR_result['f(d)']:.2e}\n")
+    print(f"\t{NR_result['iteração']} |{NR_result['d']:.6f} |{NR_result['f(d)']:.2e}\n")
    
     print("Agora é sua vez!")
     while True:
         try:
             n = int(input("Digite o número de foguetes: "))
             F = []
+
             for _ in range(n):
                 a = float(input("Digite o valor de a: "))
                 fx = funcao(a)
                 dfx = df(fx)
-                I = invervalo(fx)
+                int_inf = float(input("Digite o início do intervalo: "))
+                int_sup = float(input("Digite o fim do intervalo: "))
+                I = [int_inf, int_sup]
                 e = float(input("Digite o valor do erro: "))
                 F.append((fx, dfx,I,e))
-            for i, (fx, dfx, I, e) in enumerate(F):
-                print(f"Foguete {i+1}: | f(d) = {fx}  | Intervalo: {I} | Erro: {e})")
-                Bi = Bissecao(fx, I, e)[-1]
-                Pf = PF(fx, I, e)[-1]
-                NRr = NR(fx, dfx, e)[-1]
-                print(f"\tMétodo da Bisseção: d = {Bi['d']:.6f}, f(d) = {Bi['fx']:.2e}")
-                print(f"\tPosição Falsa: d = {Pf['d']:.6f}, f(d) = {Pf['fx']:.2e}")
-                print(f"\tNewton-Raphson: d = {NRr['d']:.6f}, f(d) = {NRr['f(d)']:.2e}")
-        except ValueError:
-            print("Valor inválido. Por favor, digite um número.")
 
+            for i, (fx, dfx, I, e) in enumerate(F):
+                print(f"\n Foguete {i+1}: | f(d) = {fx} | Intervalo: {I} | Erro: {e}")
+                
+                f_num = sp.lambdify(d, fx, "numpy")
+
+                #teste da raiz
+                if teste_bolzano(f_num, I):
+                    Bi = Bissecao(fx, I, e)[-1]
+                    Pf = PF(fx, I, e)[-1]
+                    NRr = NR(fx, dfx, e, I)[-1] 
+
+                    print(f"\tMétodo da Bisseção: d = {Bi['d']:.6f}, f(d) = {Bi['fx']:.2e}")
+                    print(f"\tPosição Falsa:      d = {Pf['d']:.6f}, f(d) = {Pf['fx']:.2e}")
+                    print(f"\tNewton-Raphson:     d = {NRr['d']:.6f}, f(d) = {NRr['f(d)']:.2e}")
+                else:
+                    print(f"\t ERRO: O intervalo {I} não é válido (f(a) e f(b) têm o mesmo sinal).")
+
+        except ValueError:
+            print(" Erro: Por favor, digite apenas números válidos.")
 if __name__ == "__main__":
     main()
