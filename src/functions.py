@@ -19,8 +19,63 @@ def teste_bolzano(f_num, Intervalo):
         return False
 
 def Bissecao(f, I, erro) -> list:
-    # Implente Aqui o Método da Bisseção! return([i,d] e tabela com i,di,f(di), |xi - xi|)
-    pass
+    func_numerica = sp.lambdify(d, f, "numpy")
+
+    a = I[0]
+    b = I[1]
+
+    Fa = func_numerica(a)
+    Fb = func_numerica(b)
+
+    if Fa * Fb > 0:
+        print("Erro: A função não muda de sinal no intervalo.")
+        return []
+
+    tabela = []
+
+    i = 0
+    achou_raiz = False
+    x_anterior = None
+
+    while not achou_raiz and i < 100:
+
+        x = (a + b) / 2
+        Fx = func_numerica(x)
+
+        # cálculo do erro |xi - xi-1|
+        if x_anterior is None:
+            erro_iteracao = None
+        else:
+            erro_iteracao = abs(x - x_anterior)
+
+        tabela.append({
+            "iteração": i,
+            "d": x,
+            "f(d)": Fx,
+            "erro": erro_iteracao
+        })
+
+        # critério de parada
+        if abs(Fx) < erro:
+            achou_raiz = True
+
+        else:
+
+            # atualização do intervalo
+            if Fa * Fx > 0:
+                a = x
+                Fa = Fx
+            else:
+                b = x
+                Fb = Fx
+
+        x_anterior = x
+        i += 1
+
+    if i >= 100:
+        print("Aviso: Máximo de iterações atingido.")
+
+    return tabela
 
 def PF(f, I, erro) -> list:
     # Implente Aqui o Método da Posição Falsa! return([i,d] e tabela com i,di,f(di), |xi - xi|)
