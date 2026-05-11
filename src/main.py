@@ -1,17 +1,17 @@
 import sys
 import subprocess
+
+#pacotes nessários para o projeto, caso não estejam instalados, o programa irá instalar automaticamente.
+PACOTES_NECESSARIOS = ['sympy']
+for pacote in PACOTES_NECESSARIOS:
+    try:
+        __import__(pacote)
+    except ImportError:
+        print(f"📦 Biblioteca '{pacote}' não encontrada. Instalando...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pacote])
+
 import sympy as sp
 from functions import *
-#pacotes nessários para o projeto, caso não estejam instalados, o programa irá instalar automaticamente.
-
-def baixar_pacotes():
-    PACOTES_NECESSARIOS = ['sympy']
-    for pacote in PACOTES_NECESSARIOS:
-        try:
-            __import__(pacote)
-        except ImportError:
-            print(f"📦 Biblioteca '{pacote}' não encontrada. Instalando...")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", pacote])
 
 def exibir_quadro(titulo, dados):
     print(f"\n{'='*30} {titulo} {'='*30}")
@@ -22,7 +22,6 @@ def exibir_quadro(titulo, dados):
         print(f"{d_linha['metodo']:<18} | {d_linha['d']:<12.6f} | {d_linha['erro']:<12.2e} | {d_linha['i']:<10} | {status}")
 
 def main():
-    baixar_pacotes()
     print("SISTEMA DE ANÁLISE DE REENTRADA - TEMA 1")
     
     try:
