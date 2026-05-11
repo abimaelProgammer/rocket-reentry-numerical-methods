@@ -54,6 +54,7 @@ def main():
             ]
 
             exibir_quadro(f"FOGUETE {k+1} (a={a_val})", dados_foguete)
+        input("Digite Enter Sair...")
             
     except Exception as e:
         print(f"Erro na execução: {e}")
