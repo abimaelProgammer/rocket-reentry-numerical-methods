@@ -368,6 +368,6 @@ int main(){
  
     cout << "\n  Observacao: 'Explode' = d > 2 cm (foguete em risco).\n";
     cout << "              'Seguro'  = d <= 2 cm.\n\n";
-    C:\msys64\mingw64\bin\g++.exe main.cpp -o main.exe -static-libgcc -static-libstdc++ -static
+
     return 0;
 }
