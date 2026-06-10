@@ -52,8 +52,45 @@ def pivotacao(n,A,b):
             b[k], b[max_index] = b[max_index], b[k]
     return eliminacao_gaussiana(n,A,b)
 
-def LDU(n,A):
-    pass
+def LDU(n, A):
+
+    U = [linha[:] for linha in A]
+
+    L = [[0]*n for _ in range(n)]
+
+    for i in range(n):
+        L[i][i] = 1
+
+    # Fatoração LU
+    for k in range(n-1):
+
+        if U[k][k] == 0:
+            raise ZeroDivisionError("Pivô nulo.")
+
+        for i in range(k+1, n):
+
+            coef = U[i][k] / U[k][k]
+
+            L[i][k] = coef
+
+            for j in range(k, n):
+                U[i][j] = U[i][j] - coef * U[k][j]
+
+    # Construção da matriz D
+    D = [[0]*n for _ in range(n)]
+
+    for i in range(n):
+
+        D[i][i] = U[i][i]
+
+        if D[i][i] == 0:
+            raise ZeroDivisionError("Pivô nulo.")
+
+        # Normaliza U para ficar com diagonal unitária
+        for j in range(i, n):
+            U[i][j] = U[i][j] / D[i][i]
+
+    return [L, D, U]
 
 def LDP(n, A, f):
     # Presumindo que sua função LDU retorne as matrizes L, D e U corretamente
@@ -87,12 +124,81 @@ def LDP(n, A, f):
     
     return d
 
+
+def verifica_solucao(A, x, f):
+
+    resultado = []
+
+    for i in range(len(A)):
+        soma = 0
+
+        for j in range(len(A)):
+            soma += A[i][j] * x[j]
+
+        resultado.append(soma)
+
+    print("Ax =", resultado)
+    print("f  =", f)
+
+def resolver_por_LDU(n, A, f):
+
+    L, D, U = LDU(n, A)
+
+    # Ly = f
+    y = substituicao_Progressiva(n, L, f)
+
+    # Dz = y
+    z = [0] * n
+    for i in range(n):
+        z[i] = y[i] / D[i][i]
+
+    # Ux = z
+    x = substituicao_Retroativa(n, U, z)
+
+    return x
+
 def main():
-    A = [[3, 2, 4], [0, 1/3, 2/3], [0, 0, -8]]
-    b = [1, 5/3, 0]
+
+    A = [
+        [3, -2, 1],
+        [1, -3, 4],
+        [9, 4, -5]
+    ]
+
+    f = [8, 6, 11]
+
     n = len(A)
-    x = eliminacao_gaussiana(n, A, b)
-    print("Solução do sistema: ", x)
+
+    print("=== ELIMINAÇÃO DE GAUSS ===")
+
+    x_gauss = eliminacao_gaussiana(
+        n,
+        [linha[:] for linha in A],
+        f[:]
+    )
+
+    print("Solução:", x_gauss)
+
+    print("\n=== LDP ===")
+
+    x_ldp = LDP(
+        n,
+        [linha[:] for linha in A],
+        f[:]
+    )
+
+    print("Solução:", x_ldp)
+
+    print("\n=== LDU ===")
+
+    x_ldu = resolver_por_LDU(
+        n,
+        [linha[:] for linha in A],
+        f[:]
+    )
+
+    print("Solução:", x_ldu)
+
 
 if __name__ == "__main__":
-    main() 
+    main()
