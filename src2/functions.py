@@ -93,33 +93,23 @@ def LDU(n, A):
     return [L, D, U]
 
 def LDP(n, A, f):
+    # 1. Obter as matrizes da fatoração LDU
     # Presumindo que sua função LDU retorne as matrizes L, D e U corretamente
     matrizes = LDU(n, A)
     L = matrizes[0]
     D = matrizes[1]
-    U = matrizes[2]
+    P = matrizes[2] # Na fatoração LDP, a matriz P é exatamente a matriz U
     
-    # 1. Pegando a inversa de D (apenas a diagonal importa)
-    D_inv = [[0]*n for _ in range(n)]
-    for i in range(n):
-        D_inv[i][i] = 1.0 / D[i][i]
-        
-    # 2. Construindo a matriz P (P = D_inv * U)
-    P = [[0]*n for _ in range(n)]
-    for i in range(n):
-        for j in range(n):
-            P[i][j] = D_inv[i][i] * U[i][j]
-            
-    # 3. Achando y: Ly = f (Substituição Progressiva / Avanço)
+    # 2. Achando y: Ly = f (Substituição Progressiva / Avanço)
     y = substituicao_Progressiva(n, L, f)
     
-    # 4. Achando z: Dz = y (Divisão direta, pois D é diagonal)
-    z = [0] * n
+    # 3. Achando z: Dz = y (Divisão direta, pois D é diagonal)
+    z = [0.0] * n
     for i in range(n):
         z[i] = y[i] / D[i][i]
         
-    # 5. Achando d: Pd = z (Substituição Regressiva / Retroativa)
-    # Nota: Certifique-se de passar n, P e z para a sua função de substituição para trás
+    # 4. Achando d: Pd = z (Substituição Regressiva / Retroativa)
+    # Como P é triangular superior (com 1s na diagonal), usamos a retroativa
     d = substituicao_Retroativa(n, P, z)
     
     return d
