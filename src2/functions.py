@@ -168,6 +168,7 @@ def main():
     )
 
     print("Solução:", x_gauss)
+    print("Deslocamentos (módulo):", [abs(x) for x in x_gauss])
 
     print("\n=== LDP ===")
 
@@ -178,6 +179,7 @@ def main():
     )
 
     print("Solução:", x_ldp)
+    print("Deslocamentos (módulo):", [abs(x) for x in x_ldp])
 
     print("\n=== LDU ===")
 
@@ -188,7 +190,7 @@ def main():
     )
 
     print("Solução:", x_ldu)
-
+    print("Deslocamentos (módulo):", [abs(x) for x in x_ldu])
 
 if __name__ == "__main__":
     main()
