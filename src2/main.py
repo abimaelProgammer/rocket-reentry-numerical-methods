@@ -80,59 +80,65 @@ def imprimir_tabela(cenarios):
     print("="*110)
 
 def main():
-    print("=" * 60)
-    print("     SISTEMA DE ANÁLISE ESTRUTURAL DO FOGUETE")
-    print("=" * 60)
-    print("Opção 1 - Executar Quadro de Testes Padrão (Cenários 0 a 3)")
-    print("Opção 2 - Inserir Variação Personalizada via Teclado")
+    while True:
+        print("=" * 60)
+        print("     SISTEMA DE ANÁLISE ESTRUTURAL DO FOGUETE")
+        print("=" * 60)
+        print("Opção 1 - Executar Quadro de Testes Padrão (Cenários 0 a 3)")
+        print("Opção 2 - Inserir Variação Personalizada via Teclado")
+        print("Opção 0 - Sair")
 
-    opcao = input("\nEscolha uma opção (1 ou 2): ").strip()
+        opcao = input("\nEscolha uma opção (1, 2 ou 0): ").strip()
 
-    A_original = [[3.0, -2.0, 1.0], [1.0, -3.0, 4.0], [9.0, 4.0, -5.0]]
-    f_original = [8.0, 6.0, 11.0]
+        A_original = [[3.0, -2.0, 1.0], [1.0, -3.0, 4.0], [9.0, 4.0, -5.0]]
+        f_original = [8.0, 6.0, 11.0]
 
-    if opcao == "1":
-        f_c1 = [16.0, 12.0, 22.0] 
-        A_c2 = [[1.0, -2.0, 1.0], [1.0, -1.0, 4.0], [9.0, 4.0, -5.0]]
+        if opcao == "1":
+            f_c1 = [16.0, 12.0, 22.0] 
+            A_c2 = [[1.0, -2.0, 1.0], [1.0, -1.0, 4.0], [9.0, 4.0, -5.0]]
 
-        # Dicionário para guardar as soluções de todos os métodos em cada cenário
-        cenarios = {
-            "0. Caso Padrão": {
-                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_original], f_original[:]),
-                "LU":    resolver_LU_aux(A_original, f_original),
-                "LDP":   functions.LDP(3, [l[:] for l in A_original], f_original[:])
-            },
-            "1. Força Dobrada - (f)": {
-                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_original], f_c1[:]),
-                "LU":    resolver_LU_aux(A_original, f_c1),
-                "LDP":   functions.LDP(3, [l[:] for l in A_original], f_c1[:])
-            },
-            "2. Rigidez Menor - [A]": {
-                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_c2], f_original[:]),
-                "LU":    resolver_LU_aux(A_c2, f_original),
-                "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_original[:])
-            },
-            "3. Caso Extremo -(f)/[A]": {
-                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_c2], f_c1[:]),
-                "LU":    resolver_LU_aux(A_c2, f_c1),
-                "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_c1[:])
-            }
-        }
-        imprimir_tabela(cenarios)
-
-    elif opcao == "2": #entrada personalizada de [A] e (f)
-        A_user, f_user = capturar_dados_usuario()
-        if A_user is not None and f_user is not None:
+            # Dicionário para guardar as soluções de todos os métodos em cada cenário
             cenarios = {
-                "Usuário: Personalizado": {
-                    "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_user], f_user[:]),
-                    "LU":    resolver_LU_aux(A_user, f_user),
-                    "LDP":   functions.LDP(3, [l[:] for l in A_user], f_user[:])
+                "0. Caso Padrão": {
+                    "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_original], f_original[:]),
+                    "LU":    resolver_LU_aux(A_original, f_original),
+                    "LDP":   functions.LDP(3, [l[:] for l in A_original], f_original[:])
+                },
+                "1. Força Dobrada - (f)": {
+                    "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_original], f_c1[:]),
+                    "LU":    resolver_LU_aux(A_original, f_c1),
+                    "LDP":   functions.LDP(3, [l[:] for l in A_original], f_c1[:])
+                },
+                "2. Rigidez Menor - [A]": {
+                    "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_c2], f_original[:]),
+                    "LU":    resolver_LU_aux(A_c2, f_original),
+                    "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_original[:])
+                },
+                "3. Caso Extremo -(f)/[A]": {
+                    "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_c2], f_c1[:]),
+                    "LU":    resolver_LU_aux(A_c2, f_c1),
+                    "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_c1[:])
                 }
             }
             imprimir_tabela(cenarios)
-    else:
-        print("Opção Inválida! Finalizando programa...")
+
+        elif opcao == "2": #entrada personalizada de [A] e (f)
+            A_user, f_user = capturar_dados_usuario()
+            if A_user is not None and f_user is not None:
+                cenarios = {
+                    "Usuário: Personalizado": {
+                        "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_user], f_user[:]),
+                        "LU":    resolver_LU_aux(A_user, f_user),
+                        "LDP":   functions.LDP(3, [l[:] for l in A_user], f_user[:])
+                    }
+                }
+                imprimir_tabela(cenarios)
+        elif opcao == "0":
+            input("Até a Próxima!")
+            break
+        else:
+            input ("Opção Inválida! Finalizando programa...")
+            break
 
 if __name__ == "__main__":
     main()
