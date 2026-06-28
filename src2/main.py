@@ -1,6 +1,17 @@
+import subprocess
+import sys
+PACOTES_NECESSARIOS = ['numpy']
+for pacote in PACOTES_NECESSARIOS:
+    try:
+        __import__(pacote)
+    except ImportError:
+        print(f"📦 Biblioteca '{pacote}' não encontrada. Instalando...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pacote])
+
 import functions
 import numpy as np
 import LU
+
 
 def resolver_LU_aux(matriz_A, vetor_f):
     # CORREÇÃO: 'n' passa a ser dinâmico com base no tamanho da matriz inserida
