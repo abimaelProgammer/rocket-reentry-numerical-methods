@@ -1,4 +1,5 @@
 import functions
+import numpy as np
 import LU
 
 def resolver_LU_aux(matriz_A, vetor_f):
@@ -21,99 +22,29 @@ def resolver_LU_aux(matriz_A, vetor_f):
         return x
     return None
 
-
-def modo_interativo():
-    print("\n--- ENTRADA DE DADOS (Tema 1) ---")
-    try:
-        n = int(input("Introduza o número de deslocamentos (n): "))
-        if n <= 0:
-            print("Número inválido.")
-            return
-
-        A = []
-        print("Introduza os valores da matriz de propriedades [A]:")
-        for i in range(n):
-            linha = []
-            for j in range(n):
-                val = float(input(f"A[{i+1}][{j+1}]: "))
-                linha.append(val)
-            A.append(linha)
-
-        f = []
-        print("Introduza os valores do vetor de forças {f}:")
-        for i in range(n):
-            val = float(input(f"f[{i+1}]: "))
-            f.append(val)
-
-        print("\n--- RESULTADOS ---")
+def capturar_dados_usuario():
+    print("\n--- INSERÇÃO DE DADOS PERSONALIZADOS (Matriz 3x3) ---")
+    print("Digite as linhas da Matriz A separando os elementos por espaço:")
+    A_user = []
+    for i in range(3):
+        linha = list(map(float, input(f"Linha {i+1}: ").split()))
+        if len(linha) != 3:
+            print("Erro: A linha precisa ter exatamente 3 elementos.")
+            return None, None
+        A_user.append(linha)
         
-        # Alínea a) Método LU Normal
-        d_lu = resolver_LU_aux(A, f)
-        print("Método LU Normal:")
-        if d_lu:
-            print(f"Vetor {{d}} = {[round(val, 6) for val in d_lu]}")
-        else:
-            print("Falha na resolução (matriz singular).")
+    print("\nDigite os 3 elementos do vetor f separados por espaço:")
+    f_user = list(map(float, input("Vetor f: ").split()))
+    if len(f_user) != 3:
+        print("Erro: O vetor f precisa ter exatamente 3 elementos.")
+        return None, None
+        
+    return A_user, f_user
 
-        # Alínea b) Método LDP
-        print("\nMétodo Fatoração LDP:")
-        try:
-            d_ldp = functions.LDP(n, [l[:] for l in A], f[:])
-            print(f"Vetor {{d}} = {[round(val, 6) for val in d_ldp]}")
-        except Exception as e:
-            print(f"Falha na resolução LDP: {e}")
-            d_ldp = None
-
-        # Alínea e) Análise do Foguetão (Limite de 2cm em módulo)
-        print("\n--- ANÁLISE DO FOGUETÃO ---")
-        d_final = d_lu if d_lu else d_ldp
-        if d_final:
-            estourou = False
-            for i, deslocamento in enumerate(d_final):
-                if abs(deslocamento) > 2.0:
-                    estourou = True
-                    print(f"ALERTA: Deslocamento d{i+1} = {abs(deslocamento):.4f} cm excede o limite de 2 cm!")
-            
-            if estourou:
-                print("ESTADO: EXPLODIU! Ocorreram danos gigantescos.")
-            else:
-                print("ESTADO: SEGURO! Todos os deslocamentos estão dentro do limite tolerável.")
-
-    except ValueError:
-        print("Erro: Introduziu um valor inválido.")
-
-
-def modo_calibracao():
-    # Alínea c) Calibração com os valores padrão
-    A_original = [[3.0, -2.0, 1.0], [1.0, -3.0, 4.0], [9.0, 4.0, -5.0]]
-    f_original = [8.0, 6.0, 11.0]
-    
-    # Alínea d) Variação dos valores de [A] e {f} para o quadro resposta
-    f_c1 = [16.0, 12.0, 22.0] 
-    A_c2 = [[1.0, -2.0, 1.0], [1.0, -1.0, 4.0], [9.0, 4.0, -5.0]]
-
-    cenarios = {
-        "0. Caso Padrão (Alínea C)": {
-            "LU":    resolver_LU_aux(A_original, f_original),
-            "LDP":   functions.LDP(3, [l[:] for l in A_original], f_original[:])
-        },
-        "1. Força Dobrada {f}": {
-            "LU":    resolver_LU_aux(A_original, f_c1),
-            "LDP":   functions.LDP(3, [l[:] for l in A_original], f_c1[:])
-        },
-        "2. Rigidez Menor [A]": {
-            "LU":    resolver_LU_aux(A_c2, f_original),
-            "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_original[:])
-        },
-        "3. Caso Extremo": {
-            "LU":    resolver_LU_aux(A_c2, f_c1),
-            "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_c1[:])
-        }
-    }
-
-    print("\n" + "="*105)
-    print(f"{'QUADRO RESPOSTA - VARIAÇÕES DE [A] E {f} (Tema 1 - Alínea D e E)':^105}")
-    print("="*105)
+def imprimir_tabela(cenarios):
+    print("\n" + "="*110)
+    print(f"{'QUADRO COMPARATIVO DE VARIAÇÕES - SENSIBILIDADE':^110}")
+    print("="*110)
     print(f"| {'Cenário':<24} | {'Método':<7} | {'Vetor de Deslocamentos {d} em cm':^45} | {'Status':^11} |")
     print("|" + "-"*26 + "|" + "-"*9 + "|" + "-"*47 + "|" + "-"*13 + "|")
 
@@ -133,29 +64,64 @@ def modo_calibracao():
             primeira_linha = False
         print("|" + "-"*26 + "|" + "-"*9 + "|" + "-"*47 + "|" + "-"*13 + "|")
 
-    print("="*105)
-    print(f"{'Critério de Segurança: Estabilidade garantida para |d| <= 2.000000 cm.':^105}")
-    print("="*105)
-
+    print("="*110)
+    print(f"{'Critério de Segurança: Estabilidade garantida para |d| <= 2.000000 cm.':^110}")
+    print("="*110)
 
 def main():
-    while True:
-        print("\n=== MENU PRINCIPAL - TEMA 1 (Reentrada do Foguetão) ===")
-        print("1. Introduzir dados dinâmicos do sistema (Alíneas A, B e Entrada de Dados)")
-        print("2. Executar calibração e quadro resposta (Alíneas C, D, E)")
-        print("0. Sair")
-        
-        escolha = input("Selecione uma opção: ")
-        
-        if escolha == '1':
-            modo_interativo()
-        elif escolha == '2':
-            modo_calibracao()
-        elif escolha == '0':
-            print("A encerrar o programa...")
-            break
-        else:
-            print("Opção inválida!")
+    print("=" * 60)
+    print("     SISTEMA DE ANÁLISE ESTRUTURAL DO FOGUETE")
+    print("=" * 60)
+    print("Opção 1 - Executar Quadro de Testes Padrão (Cenários 0 a 3)")
+    print("Opção 2 - Inserir Variação Personalizada via Teclado")
+
+    opcao = input("\nEscolha uma opção (1 ou 2): ").strip()
+
+    A_original = [[3.0, -2.0, 1.0], [1.0, -3.0, 4.0], [9.0, 4.0, -5.0]]
+    f_original = [8.0, 6.0, 11.0]
+
+    if opcao == "1":
+        f_c1 = [16.0, 12.0, 22.0] 
+        A_c2 = [[1.0, -2.0, 1.0], [1.0, -1.0, 4.0], [9.0, 4.0, -5.0]]
+
+        # Dicionário para guardar as soluções de todos os métodos em cada cenário
+        cenarios = {
+            "0. Caso Padrão": {
+                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_original], f_original[:]),
+                "LU":    resolver_LU_aux(A_original, f_original),
+                "LDP":   functions.LDP(3, [l[:] for l in A_original], f_original[:])
+            },
+            "1. Força Dobrada - (f)": {
+                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_original], f_c1[:]),
+                "LU":    resolver_LU_aux(A_original, f_c1),
+                "LDP":   functions.LDP(3, [l[:] for l in A_original], f_c1[:])
+            },
+            "2. Rigidez Menor - [A]": {
+                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_c2], f_original[:]),
+                "LU":    resolver_LU_aux(A_c2, f_original),
+                "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_original[:])
+            },
+            "3. Caso Extremo -(f)/[A]": {
+                "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_c2], f_c1[:]),
+                "LU":    resolver_LU_aux(A_c2, f_c1),
+                "LDP":   functions.LDP(3, [l[:] for l in A_c2], f_c1[:])
+            }
+        }
+        imprimir_tabela(cenarios)
+
+    elif opcao == "2": #entrada personalizada de [A] e (f)
+        A_user, f_user = capturar_dados_usuario()
+        if A_user is not None and f_user is not None:
+            cenarios = {
+                "Usuário: Personalizado": {
+                    "Gauss": functions.eliminacao_gaussiana(3, [l[:] for l in A_user], f_user[:]),
+                    "LU":    resolver_LU_aux(A_user, f_user),
+                    "LDP":   functions.LDP(3, [l[:] for l in A_user], f_user[:])
+                }
+            }
+            imprimir_tabela(cenarios)
+    else:
+        print("Opção Inválida! Finalizando programa...")
 
 if __name__ == "__main__":
     main()
